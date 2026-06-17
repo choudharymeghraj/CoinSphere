@@ -9,7 +9,7 @@ export default function Coins() {
   const [coins, setCoins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState("inr");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const btns = new Array(132).fill(1);
@@ -41,14 +41,18 @@ export default function Coins() {
         setCoins(data);
         setLoading(false);
       } catch (error) {
-        setError(true);
+        if (error.response && error.response.status === 429) {
+          setError('CoinGecko API Rate Limit Exceeded. Please wait a moment and refresh.');
+        } else {
+          setError('Error While Fetching Coins');
+        }
         setLoading(false);
       }
     }
     getC();
   }, [currency, currentPage])
 
-  if (error) return <Error Message={'Error While Fetching Coins'} />
+  if (error) return <Error Title="Fetch Failure" Message={error} />
 
   const currencies = [
     { label: 'INR (₹)', value: 'inr' },

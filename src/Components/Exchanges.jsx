@@ -7,7 +7,7 @@ import Error from './Error';
 export default function Exchanges() {
   const [arr, setArr] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
 
   const cardBg = useColorModeValue('white', 'rgba(18, 24, 38, 0.45)');
   const cardBorder = useColorModeValue('rgba(0, 0, 0, 0.05)', 'rgba(255, 255, 255, 0.06)');
@@ -22,7 +22,11 @@ export default function Exchanges() {
         setLoading(false);
       } 
       catch (error) {
-        setError(true);
+        if (error.response && error.response.status === 429) {
+          setError('CoinGecko API Rate Limit Exceeded. Please wait a moment and refresh.');
+        } else {
+          setError('Error While Fetching Exchanges');
+        }
         setLoading(false);
       }
     })
@@ -30,7 +34,7 @@ export default function Exchanges() {
     getD();
   }, [])
 
-  if (error) return <Error Message={'Error While Fetching Exchanges'} />
+  if (error) return <Error Title="Fetch Failure" Message={error} />
 
   return (
     <Container maxW={'container.xl'} py={10}>
